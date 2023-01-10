@@ -1,3 +1,28 @@
+function make_color_buttons(colorlist) {
+  let push_buttons_tempi = push_buttons.length;
+  for (let i = 0; i < colorlist.length; ++i) {
+    push_buttons.push(
+      new Button(
+        "",
+        15,
+        () => {
+          brush_color_picker.picker.value(colorlist[i]);
+          if (drawmode == "erase") drawmode = "draw";
+        },
+        false,
+        15 + brush_color_picker.w + 24 * i,
+        height - 50,
+        0
+      )
+    );
+    push_buttons[push_buttons_tempi + i].w =
+      push_buttons[push_buttons_tempi + i].h;
+    push_buttons[push_buttons_tempi + i].c_outside = color(colorlist[i]);
+    push_buttons[push_buttons_tempi + i].c_inside = color(colorlist[i]);
+    push_buttons[push_buttons_tempi + i].highlight = true;
+  }
+}
+
 class ColorPicker {
   constructor(g) {
     this.g = g;
@@ -9,6 +34,7 @@ class ColorPicker {
     this.picker.size(this.w, this.h);
     this.picker.style("opacity", "0");
     this.picker.style("transform-origin", "0% 0%");
+    this.picker.style("cursor", "pointer");
     // this.picker.style( "background-color" , "red" ) ;
     this.mx = this.my = 0;
     this.a = 0;
@@ -56,19 +82,18 @@ class ColorPicker {
     this.g.noStroke();
     // this.g.text("< COLOR >", 0, 0);
 
-    this.g.stroke(155, this.a);
+    this.g.stroke(100, this.a);
     this.g.strokeWeight(2);
-
     this.g.fill(this.color);
     this.g.rect(0, 0, this.w, this.h);
     this.g.pop();
     // this.size_slider.work();
     // this.alpha_slider.work();
-    
+
   }
   work() {
     // if(this.inside()) cursor(HAND);
-    // this.a = lerp(this.a, this.inside() ? 255 : 10, 0.08);
+    this.a = lerp(this.a, this.inside() ? 255 : 10, 0.08);
     this.setm(translatePoint(mouseX, mouseY, this.x, this.y, this.theta));
     this.color = lerpColor(this.color, this.picker.color(), 0.08);
     this.color.setAlpha(this.alpha_slider.value);
@@ -85,7 +110,7 @@ class ColorPicker {
       0.6
     );
     this.display();
-    
+
   }
 }
 
@@ -109,6 +134,7 @@ class Slider {
     this.d = 2 * this.r;
     this.on = false;
     this.color_button = color(0, 0);
+    this.color_button_target = color(255, 0, 69);
     this.color_line = color(255, 0, 69);
     this.color_text = color(255, 0, 69);
     this.bx = this.xoff = this.yoff = this.mx = this.my = 0;
@@ -178,9 +204,11 @@ class Slider {
         this.minval + (this.maxval - this.minval) * (this.bx / this.w);
       if (!mouseIsPressed) this.on = false;
     }
-    if (this.inside(this.mx, this.my) || this.on)
+    if (this.inside(this.mx, this.my) || this.on) {
+      cursor(HAND);
       this.color_button = lerpColor(this.color_button, color(0, 0, 0), 0.1);
+    }
     else
-      this.color_button = lerpColor(this.color_button, color(255, 0, 69), 0.1);
+      this.color_button = lerpColor(this.color_button, this.color_button_target, 0.1);
   }
 }

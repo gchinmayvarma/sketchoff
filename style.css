@@ -6,6 +6,7 @@ body {
   overflow-y: hidden;
   overflow-x: hidden;
   /* Hide scrollbar */
+  background-color: #000000;
 }
 
 canvas {

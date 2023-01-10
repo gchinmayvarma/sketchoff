@@ -1,32 +1,10 @@
-function make_color_buttons(colorlist) {
-  let push_buttons_tempi = push_buttons.length;
-  for (let i = 0; i < colorlist.length; ++i) {
-    push_buttons.push(
-      new Button(
-        "",
-        15,
-        ()=>{
-          brush_color_picker.picker.value(colorlist[i]);  
-        },
-        false,
-        15 + brush_color_picker.w + 24*i,
-        height - 50,
-        0
-      )
-    );
-    push_buttons[push_buttons_tempi + i].w =
-      push_buttons[push_buttons_tempi + i].h;
-    push_buttons[push_buttons_tempi+i].c_outside = color(colorlist[i]);
-  }
-}
-
 class ToggleButton {
   constructor(size = 20, x = 0, y = 0, t = -10) {
     this.textSize = size;
     this.position(x, y);
     this.setit();
     this.sx = 0;
-    this.on = true;
+    this.on = false;
     this.theta = radians(t);
     this.coloron = color(255, 0, 100, 150);
     this.coloroff = color(85, 27, 194, 150);
@@ -151,6 +129,8 @@ class Button {
     this.lines_dis = 20;
     this.lines_speed = 0.5;
     this.lines_weight = 2;
+    this.a = 0;
+    this.highlight = true;
   }
   position(x, y) {
     this.x = x;
@@ -187,15 +167,22 @@ class Button {
     push();
     translate(this.x, this.y);
     rotate(this.theta);
-    stroke(0);
-    strokeWeight(1);
+
     fill(this.c);
+    if (this.highlight) {
+      stroke(200, this.a);
+      strokeWeight(2);
+    } else {
+      stroke(0);
+      strokeWeight(1);
+    }
     rect(0, 0, this.w, this.h);
     //if( this.inside() )
     //this.display_lines() ;
     textSize(this.textSize);
     textAlign(CENTER, CENTER);
     fill(150);
+    noStroke();
     text(this.s, this.w / 2, this.h / 2);
     pop();
   }
@@ -236,6 +223,7 @@ class Button {
       this.inside() ? this.c_inside : this.c_outside,
       0.1
     ); //: lerpColor(this.c, this.c_outside, 0.1);
+    this.a = lerp(this.a, this.inside() ? 255 : 10, 0.08);
     // this.c_lines =  //lerpColor(this.c_lines,this.inside()? this.c_outside:this.c_inside, 0.05) ;
     if (this.displaylikelink) this.display_aslink();
     else this.display();
@@ -244,7 +232,7 @@ class Button {
   }
 }
 
-function emptyfunction() {}
+function emptyfunction() { }
 
 function translatePoint(absPointX, absPointY, centerX, centerY, theta) {
   // theta in radians
