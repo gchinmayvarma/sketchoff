@@ -1,11 +1,15 @@
-let background_color;
+let display_background = false;
+let pg;
+let temp_canvas;
+
 function setup() {
   createCanvas(innerWidth, innerHeight);
   pg = createGraphics(width, height);
-  background_color = color(20);
+  document.body.style.backgroundColor = background_color_default.toString();
   clear();
   board_clear();
   ui_setup();
+  ui_position();
 }
 let pivot_x = 0;
 let pivot_y = 0;
@@ -33,10 +37,12 @@ function draw() {
     push_buttons[9].a = 255;
     if (mouseIsPressed && !mouse_used) {
       cursor("crosshair");
-      strokeWeight(brush_size_slider.value);
-      stroke(brush_color_picker.picker.color());
+      // strokeWeight(brush_size_slider.value);   //rectangle ghost
+      // stroke(brush_color_picker.picker.color()); 
+      strokeWeight(2);
+      stroke(200);
       noFill();
-      rect(pivot_x, pivot_y, mouseX - pivot_x, mouseY - pivot_y);
+      dotted_rect(pivot_x, pivot_y, mouseX - pivot_x, mouseY - pivot_y);
     } else {
       noStroke();
       textSize(20);
@@ -82,7 +88,7 @@ function draw() {
     text("Erase", mouseX + 15, mouseY + 4);
     noFill();
     stroke(155);
-    strokeWeight(brush_size_slider.value/4);
+    strokeWeight(brush_size_slider.value / 4);
     let i = brush_size_slider.value * 2;
     line(
       mouseX - i,
@@ -190,8 +196,19 @@ function dotted_line(x1, y1, x2, y2) {
   }
 }
 
+function dotted_rect(x, y, w, h) {
+  dotted_line(x, y, x + w, y);
+  dotted_line(x, y, x, y + h);
+  dotted_line(x + w, y, x + w, y + h);
+  dotted_line(x, y + h, x + w, y + h);
+}
 function windowResized() {
   resizeCanvas(innerWidth, innerHeight);
-  ui_setup();
+  if (width > pg.width || height > pg.height) {
+    let temp = createGraphics(width, height);
+    temp.image(pg, 0, 0);
+    pg = temp;
+  }
+  ui_position();
   clear();
 }
